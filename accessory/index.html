@@ -1,14 +1,38 @@
 <!DOCTYPE html>
 <html>
- 
+
 <head>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
     <title>Car Accessories</title>
-    <link rel="stylesheet" href="/week3/css/global.css">
+    <link rel="stylesheet" href="/css/global.css">
+    <style>
+        table {
+          border-collapse: collapse;
+          width: 100%; 
+        }
+    
+        th,
+        td {
+          text-align: left;
+          padding: 8px;
+        }
+    
+        tr:nth-child(even) {
+          background-color: #f2f2f2;
+        }
+    
+        th {
+          background-color: brown;
+          color: #f2f2f2;
+        }
+        
+
+      </style>
 </head>
- 
+
 <body>
     <h1>Car Accessories</h1>
- 
+
     <form id="accessoryForm">
         <label for="accessory">Select an accessory:</label>
         <select id="accessory">
@@ -21,9 +45,9 @@
         <label for="amount">Amount:</label>
         <input type="number" id="amount" min="1" value="1">
         <br>
-        <button type="button" onclick="addToProductList()">Add</button>
+        <button type="button" id="addButton">Add</button>
     </form>
- 
+
     <table id="productList">
         <thead>
             <tr>
@@ -32,70 +56,57 @@
                 <th>Price</th>
             </tr>
         </thead>
-        <tbody>
+        <tbody id="bodddy">
             <!-- Product list items will be added here dynamically -->
         </tbody>
-        
         <tfoot>
             <tr>
-                <td colspan="2">Gross Price:</td>
-                <td id="grossPrice">0</td>
-            </tr>
-            <tr>
-                <td colspan="2">VAT Price:</td>
-                <td id="vatAmount">0</td>
-            </tr>
-            <tr>
-                <td colspan="2">NET Price:</td>
-                <td id="netAmount">0</td>
+                <td colspan="2">Total Price:</td>
+                <td id="totalPrice">0</td>
             </tr>
         </tfoot>
     </table>
- 
+    <label for="vatAmount">VAT Amount:</label>
+    <span id="vatAmount">0.00</span>
+    <br>
+    <label for="netAmount">NET Amount:</label>
+    <span id="netAmount">0.00</span>
+
     <script>
-        var grossPrice = 0;
-        var vatRate = 0.07;
-        var vatAmount = 0;
-        var netAmount = 0;
-        
+        var totalPrice = 0;
+
         function addToProductList() {
-            var accessorySelect = document.getElementById("accessory");
-            var accessoryOption = accessorySelect.options[accessorySelect.selectedIndex];
-            var accessoryName = accessoryOption.text;
-            var accessoryPrice = accessoryOption.value;
-            var amountInput = document.getElementById("amount");
-            var amount = amountInput.value;
- 
-            var productList = document.getElementById("productList");
-            var newRow = productList.insertRow(1);
-            var accessoryCell = newRow.insertCell(0);
-            var amountCell = newRow.insertCell(1);
-            var priceCell = newRow.insertCell(2);
- 
-            accessoryCell.innerHTML = accessoryName;
-            amountCell.innerHTML = amount;
-            priceCell.innerHTML = accessoryPrice * amount;
- 
-            grossPrice += amount* accessoryPrice;
-            document.getElementById("grossPrice").innerHTML = grossPrice;
-            vatAmount = grossPrice * vatRate;
-            document.getElementById("vatAmount").textContent = vatAmount.toFixed(2);
-            netAmount = grossPrice + vatAmount
-            document.getElementById("netAmount").textContent = netAmount.toFixed(2)
+            var accessorySelect = $("#accessory");
+            var accessoryOption = accessorySelect.find(":selected");
+            var accessoryName = accessoryOption.text();
+            var accessoryPrice = parseFloat(accessoryOption.val());
+            var amount = parseInt($("#amount").val());
+
+            var productList = $("#bodddy");
+            var newRow = $("<tr></tr>");
+            var accessoryCell = $("<td></td>").text(accessoryName);
+            var amountCell = $("<td></td>").text(amount);
+            var priceCell = $("<td></td>").text((accessoryPrice * amount).toFixed(2));
+
+            newRow.append(accessoryCell);
+            newRow.append(amountCell);
+            newRow.append(priceCell);
+            productList.append(newRow);
+
+            totalPrice += accessoryPrice * amount;
+            $("#totalPrice").text(totalPrice.toFixed(2));
+
+            var vatRate = 0.07;
+            var vatAmount = totalPrice * vatRate;
+            $("#vatAmount").text(vatAmount.toFixed(2));
+            var netAmount = totalPrice + vatAmount;
+            $("#netAmount").text(netAmount.toFixed(2));
         }
 
-        function calculateVAT() {
-            var gp = parseFloat(document.getElementById("grossPrice").value);
-            var grossPrice = parseFloat(gp);
-            var vatRate = 0.07; // 7% VAT rate
-            var vatAmount = grossPrice * vatRate;
-            document.getElementById("vatAmount").textContent = vatAmount.toFixed(2);
-            var netAmount = grossPrice + vatAmount
-            document.getElementById("netAmount").textContent = netAmount.toFixed(2)
-        }
+        $(document).ready(function () {
+            $("#addButton").on("click", addToProductList);
+        });
     </script>
 </body>
- 
+
 </html>
-
-
